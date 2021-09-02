@@ -8,13 +8,19 @@ import os
 import time
 from datetime import date
 
+from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException
 
 from common.handle_path import image_dir
 from common.handle_log import log
+from common.handle_ini import HandleIni
+
+
+time_out = HandleIni().get_value("setting", "timeout", value_type="int")
 
 
 class BasePage:
@@ -39,11 +45,11 @@ class BasePage:
         """
         return str(date.today())
 
-    def find_element_wait(self, locator, index: int = 0, timeout=15):
+    def find_element_wait(self, locator, index: int = 0, timeout=time_out) -> WebElement:
         """
-        driver.find_element 方法封装，兼容多种情况。如 locator 定位到多个元素，通过 index 来选择。
+        driver.find_element 方法封装，兼容多种情况。如 polocator 定位到多个元素，通过 index 来选择。
         :param locator:
-        :param index: locator 定位索引，从0开始，默认为 0
+        :param index: polocator 定位索引，从 0 开始，默认为 0
         :param timeout:
         :return:
         """
@@ -66,6 +72,10 @@ class BasePage:
             self.save_img("点击失败")
 
     def send_text(self, locator, text, index=0):
+        try:
+            self.find_element_wait(locator, index).clear()
+        except Exception as e:
+            log.error('{}元素清除文本失败！\n {}'.format(locator, e))
         try:
             self.find_element_wait(locator, index).send_keys(text)
         except Exception as e:
@@ -200,7 +210,7 @@ class BasePage:
     def current_window_handle(self):
         return self.driver.current_window_handle
 
-    def wait_ele_visible(self, locator, timeout=15):
+    def wait_ele_visible(self, locator, timeout=time_out):
         """
         等待元素可见
 
@@ -217,7 +227,7 @@ class BasePage:
             self.save_img(f"等待元素可见失败")
         return ele
 
-    def wait_ele_presence(self, locator, timeout=15):
+    def wait_ele_presence(self, locator, timeout=time_out):
         """
         等待元素存在
         """
@@ -229,29 +239,10 @@ class BasePage:
             self.save_img(f"等待存在失败")
             raise e
 
-    def wait_page_contains_element(self, locator, page_action, timeout=20, poll_frequency=0.5):
-        """
-        :param locator:
-        :param page_action:
-        :param timeout:
-        :param poll_frequency:
-        :return:
-        """
-        log.info("在 {} 行为，等待元素：{} 存在。".format(page_action, locator))
-        try:
-            start = time.time()
-            WebDriverWait(self.driver, timeout, poll_frequency).until(ec.presence_of_element_located(locator))
-        except:
-            # 输出到日志
-            log.exception("等待元素存在失败！")
-            # 失败截取当前页面
-            self.save_img(page_action)
-            raise
-        else:
-            end = time.time()
-            log.info("等待耗时为：{}".format(end - start))
-
 
 if __name__ == '__main__':
-    from selenium import webdriver
-    from time import sleep
+    print(time_out)
+    import sys
+    print(sys.path)
+    ...
+

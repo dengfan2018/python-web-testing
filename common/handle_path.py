@@ -15,7 +15,10 @@ reports_dir_allure_temp = str(base_dir.joinpath("output", "allure"))
 reports_dir_allure_html = str(base_dir.joinpath("output", "allure-html"))
 
 # 截图存放路径
-image_dir = str(base_dir.joinpath("output", "allure-html"))
+image_dir = str(base_dir.joinpath("output", "images"))
 
 # 日志的路径
 logs_dir = base_dir.joinpath("logs")
+
+# chromedriver 路径
+chrome_driver = str(base_dir.joinpath("utils", "chromedriver.exe"))
