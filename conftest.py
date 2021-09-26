@@ -3,7 +3,7 @@
 # @Author  : kanghe
 # @Email   : 244783726@qq.com
 # @File    : conftest.py
-
+import os
 import warnings
 
 import pytest
@@ -82,9 +82,21 @@ def pytest_runtest_makereport(item, call):
     """
     outcome = yield
     rep = outcome.get_result()
-    print(rep)
+    # print(rep)
     if rep.when == "call" and rep.failed:
-        allure.attach(web_driver.get_screenshot_as_png(), "失败截图", allure.attachment_type.PNG)
+
+        # mode = "a" if os.path.exists("failures") else "w"
+        # with open("failures", mode) as f:
+        #     # let's also access a fixture for the fun of it
+        #     if "tmpdir" in item.fixturenames:
+        #         extra = " (%s)" % item.funcargs["tmpdir"]
+        #     else:
+        #         extra = ""
+        #     f.write(rep.nodeid + extra + "\n")
+
+        if hasattr(web_driver, "get_screenshot_as_png"):
+            with allure.step("失败截图"):
+                allure.attach(web_driver.get_screenshot_as_png(), "失败截图", allure.attachment_type.PNG)
 
 
 @pytest.fixture(scope="class")
